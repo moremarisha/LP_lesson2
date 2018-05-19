@@ -3,7 +3,9 @@ import ephem
 import datetime
 import logging
 
+
 def get_eng_planet_name(planet_name):
+    #print('start get_eng_planet_name with planet_name = {planet_name}'.format(planet_name=planet_name))
     err = ''
     planet_name_eng = ''
     if planet_name.lower() == 'меркурий' or planet_name.lower()=='mercury':
@@ -23,13 +25,13 @@ def get_eng_planet_name(planet_name):
     elif planet_name.lower() == 'нептун' or planet_name.lower()=='neptune':
         planet_name_eng = 'Neptune'
     else:
-        err = 'There is no such planet'
-
+        err = 'There is no planet {planet_name}'.format(planet_name=planet_name)
+    #print('get_eng_planet_name stop')
     return planet_name_eng, err
 
 
 def get_constellation(planet_name, date):
-    #print('get_constellation: ', planet_name)
+    print('get_constellation start: ', planet_name)
     if planet_name == 'Mercury':
         planet = ephem.Mercury(date)
     elif planet_name == 'Venus':
@@ -46,11 +48,11 @@ def get_constellation(planet_name, date):
         planet = ephem.Uranus(date)
     elif planet_name == 'Neptune':
         planet = ephem.Neptune(date)
-    #print(planet)
+    print('get_constellation end if:', planet)
     cons_name = ephem.constellation(planet)
-    print('now the planet {planet} in the constellation {cons}'.format(planet=planet_name_eng,
+    print('the planet {planet} in the constellation {cons}'.format(planet=planet_name,
                                                                        cons=cons_name))
-    #return (cons_name)
+    return (cons_name)
 
 
 if __name__ == '__main__':

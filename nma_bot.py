@@ -12,8 +12,7 @@ logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
                     )
 
 # Настройки прокси
-PROXY = {'proxy_url': 'socks5://t1.learn.python.ru:1080',
-    'urllib3_proxy_kwargs': {'username': 'learn', 'password': 'python'}}
+PROXY={'proxy_url': 'socks5://t1.learn.python.ru:1080', 'urllib3_proxy_kwargs': {'username':'learn', 'password':'python'}}
 
 def greet_user(bot, update):
     text = 'Вызван /start'
@@ -28,26 +27,63 @@ def talk_to_me(bot, update):
 
 def run_planet_constellation(bot, update):
     #planet_name = input('enter a planet name: ')
-    update.message.reply_text('enter a planet name')
-    planet_name = update.message.text
+    planet_from_user = update.message.text
+    planet_name = planet_from_user.split('/planet ')[1]
+    print('planet_name: ', planet_name)
     today = datetime.date.today()
     (planet_name_eng, err) = planet.get_eng_planet_name(planet_name)
+    print('planet_name_eng: ', planet_name_eng)
+    print('err: ', err)
     if err == '':
+        print('err is null')
         cons_name = planet.get_constellation(planet_name_eng, today)
+        print('cons_name: ', cons_name)
         update.message.reply_text('now the planet {planet} in the constellation {cons}'.format(planet=planet_name_eng,
                                                                                                cons=cons_name))
     else:
         update.message.reply_text(err)
 
 
+def run_wordcount(bot, update):
+    print('start wordcount')
+    str_from_user = update.message.text
+    try:
+        print(str_from_user.split('/wordcount '))
+        str_analyse = str_from_user.split('/wordcount ')[1]
+    except IndexError:
+        res = 'you entered an empty string!'
+        print(res)
+        update.message.reply_text(res)
+        return
+
+    str_analyse = str_analyse.strip(' ')
+    first_simbol = str_analyse[0]
+    last_simbol = str_analyse[-1]
+    print(first_simbol, last_simbol)
+    if first_simbol != '"' and last_simbol != '"':
+        res = 'please enter quoted strings'
+        print(res)
+        update.message.reply_text(res)
+        return
+    str_analyse = str_analyse.strip('"')
+    str_analyse = str_analyse.strip(' ')
+    while '  ' in str_analyse:
+        str_analyse = str_analyse.replace('  ', ' ')
+    str_analyse_list = str_analyse.split(' ')
+    word_count = len(str_analyse_list)
+    res = 'number of words: ' + str(word_count)
+    print(res)
+    update.message.reply_text(res)
+
 def main():
     mybot = Updater('514216029:AAGrjbrD5N7NvsWwcWGcTfEcelwF_xWy71s', request_kwargs=PROXY)
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
-    #dp.add_handler(MessageHandler(Filters.text, talk_to_me))
+    dp.add_handler(MessageHandler(Filters.text, talk_to_me))
     #dp.add_handler(CommandHandler("lets_talk", lp2_while.ask_user()))
     dp.add_handler(CommandHandler("planet", run_planet_constellation))
+    dp.add_handler(CommandHandler("wordcount", run_wordcount))
 
     mybot.start_polling() #запрос к телеге
     mybot.idle()
