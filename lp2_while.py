@@ -9,20 +9,32 @@ def find_person(name_list, name):
         if name_list[i] == name:
             print(name_list.pop(i) + ' нашелся!')
             res = 1
-        i=i+1
+        i = i + 1
     if res != 1:
         print('Нет таких')
 
 
-def asc_user():
+def ask_user():
     ans = ''
-    while ans != 'Хорошо':
+    while ans.lower() != 'хорошо':
         ans = input('Как дела? ')
 
-    while ans != 'Пока!':
+    inc = 0
+    exit_flag = 0
+    while exit_flag != 1:
+        inc = inc + 1
+        question = input('говорите: ')
+        ans = get_answer(question)
+        print('ответ: ' + ans[0])
+        exit_flag = ans[1]
+        if inc == 10:
+            exit_flag = 1
+            print('ответ: мне пора!')
+
+    '''while ans != 'Пока!':
         ans = input('Скажите что-нибудь: ')
         my_ans = get_answer(ans)[0]
-        print(my_ans)
+        print(my_ans)'''
 
 
 def get_answer(question):
@@ -44,7 +56,12 @@ def get_answer(question):
 
     return answer
 
-name = input('Ведите имя для поиска: ')
-find_person(name_list, name)
 
-asc_user()
+if __name__ == '__main__':
+    try:
+        name = input('Ведите имя для поиска: ')
+        find_person(name_list, name)
+
+        ask_user()
+    except KeyboardInterrupt:
+        print('Ха ха!')
