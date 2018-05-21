@@ -1,9 +1,12 @@
 # coding = UTF-8
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
-import planet
 import datetime
+
 import lp2_while
+import planet
+import bot_constants
+import mycalc
 
 
 logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
@@ -12,7 +15,8 @@ logging.basicConfig(format='%(name)s - %(levelname)s - %(message)s',
                     )
 
 # Настройки прокси
-PROXY={'proxy_url': 'socks5://t1.learn.python.ru:1080', 'urllib3_proxy_kwargs': {'username':'learn', 'password':'python'}}
+PROXY = bot_constants.bot_proxy
+
 
 def greet_user(bot, update):
     text = 'Вызван /start'
@@ -22,7 +26,11 @@ def greet_user(bot, update):
 def talk_to_me(bot, update):
     user_text = update.message.text
     print(user_text)
-    update.message.reply_text(user_text)
+    if user_text[-1] == '=':
+        print(user_text[-1])
+        mycalc.run_calc(user_text)
+    else:
+        update.message.reply_text(user_text)
 
 
 def run_planet_constellation(bot, update):
@@ -34,12 +42,14 @@ def run_planet_constellation(bot, update):
     (planet_name_eng, err) = planet.get_eng_planet_name(planet_name)
     print('planet_name_eng: ', planet_name_eng)
     print('err: ', err)
-    if err == '':
+    if not err:
         print('err is null')
         cons_name = planet.get_constellation(planet_name_eng, today)
         print('cons_name: ', cons_name)
-        update.message.reply_text('now the planet {planet} in the constellation {cons}'.format(planet=planet_name_eng,
-                                                                                               cons=cons_name))
+        update.message.reply_text(
+            'now the planet {planet} in the constellation {cons}'.format(
+                planet=planet_name_eng,
+                cons=cons_name))
     else:
         update.message.reply_text(err)
 
@@ -76,7 +86,7 @@ def run_wordcount(bot, update):
     update.message.reply_text(res)
 
 def main():
-    mybot = Updater('514216029:AAGrjbrD5N7NvsWwcWGcTfEcelwF_xWy71s', request_kwargs=PROXY)
+    mybot = Updater(bot_constants.bot_key, request_kwargs=PROXY)
 
     dp = mybot.dispatcher
     dp.add_handler(CommandHandler("start", greet_user))
@@ -89,5 +99,5 @@ def main():
     mybot.idle()
 
 
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 main()
