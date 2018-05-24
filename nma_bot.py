@@ -2,6 +2,7 @@
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import logging
 import datetime
+import re
 
 import lp2_while
 import planet
@@ -57,16 +58,16 @@ def run_planet_constellation(bot, update):
 def run_wordcount(bot, update):
     print('start wordcount')
     str_from_user = update.message.text
-    try:
+    if len(str_from_user) > 11:
         print(str_from_user.split('/wordcount '))
         str_analyse = str_from_user.split('/wordcount ')[1]
-    except IndexError:
+    else:
         res = 'you entered an empty string!'
         print(res)
         update.message.reply_text(res)
         return
 
-    str_analyse = str_analyse.strip(' ')
+    str_analyse = str_analyse.strip()
     first_simbol = str_analyse[0]
     last_simbol = str_analyse[-1]
     print(first_simbol, last_simbol)
@@ -76,9 +77,8 @@ def run_wordcount(bot, update):
         update.message.reply_text(res)
         return
     str_analyse = str_analyse.strip('"')
-    str_analyse = str_analyse.strip(' ')
-    while '  ' in str_analyse:
-        str_analyse = str_analyse.replace('  ', ' ')
+    str_analyse = str_analyse.strip()
+    str_analyse = re.sub(' +', ',', str_analyse)
     str_analyse_list = str_analyse.split(' ')
     word_count = len(str_analyse_list)
     res = 'number of words: ' + str(word_count)
